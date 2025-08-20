@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Garden</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+            /* Default cursor - you can replace this with your watering can PNG */
+            cursor: url('images/watering-can.png') 16 16, auto;
+        }
+
+        /* Main heading */
+        .main-heading {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #2E7D32;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        /* Grass container */
+        .grass-container {
+            position: fixed;
+            transition: all 0.3s ease;
+        }
+
+        .grass-image {
+            width: 80px;
+            height: 80px;
+            transition: all 0.5s ease;
+            background-image: url('images/grass.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Water droplets */
+        .water-drop {
+            position: fixed;
+            width: 8px;
+            height: 12px;
+            background: #4A90E2;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            pointer-events: none;
+            opacity: 0.8;
+            animation: fall 0.8s ease-in forwards;
+            z-index: 50;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(150px) rotate(10deg);
+                opacity: 0;
+            }
+        }
+
+        /* Watering can tilt effect */
+        body.watering {
+            /* Tilted watering can - replace with your tilted watering can PNG */
+            cursor: url('images/watering-can-tilted.png') 16 16, auto;
+        }
+
+        /* Instructions */
+        .instructions {
+            position: fixed;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #666;
+            font-size: 16px;
+            z-index: 100;
+        }
+
+        /* Growth stages with realistic color progression */
+        /* Stage 0 (initial): Gray/dormant grass */
+        .grass-image {
+            filter: grayscale(80%) brightness(0.6) contrast(0.8);
+        }
+
+        /* Stage 1: Light brown/tan - first signs of life */
+        .grass-image.stage1 {
+            transform: scale(1.1);
+            filter: sepia(60%) hue-rotate(20deg) brightness(0.7) saturate(0.8) contrast(0.9);
+        }
+
+        /* Stage 2: Brown-orange - early growth phase */
+        .grass-image.stage2 {
+            transform: scale(1.3);
+            filter: sepia(70%) hue-rotate(35deg) brightness(0.8) saturate(1.0) contrast(1.0);
+        }
+
+        /* Stage 3: Yellow-green - transitioning to healthy grass */
+        .grass-image.stage3 {
+            transform: scale(1.6);
+            filter: sepia(40%) hue-rotate(60deg) brightness(0.9) saturate(1.2) contrast(1.1);
+        }
+
+        /* Stage 4: Light green - almost mature */
+        .grass-image.stage4 {
+            transform: scale(2.0);
+            filter: sepia(20%) hue-rotate(80deg) brightness(1.0) saturate(1.4) contrast(1.2);
+        }
+
+        /* Stage 5: Vibrant green - fully mature grass */
+        .grass-image.stage5 {
+            transform: scale(2.4);
+            filter: sepia(0%) hue-rotate(60deg) brightness(1.2) saturate(1.8) contrast(1.2);
+        }
+
+        /* Spawning animation */
+        .grass-container.spawning .grass-image {
+            animation: spawn 0.5s ease-out;
+        }
+
+        @keyframes spawn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* File upload instructions - you can remove this after adding your images */
+        .file-instructions {
+            position: fixed;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px dashed #ccc;
+            text-align: center;
+            color: #666;
+            max-width: 400px;
+            font-size: 14px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="main-heading">GRASS - always gets greener when watered</h1>
+
+    <!-- Instructions for adding your PNG files -->
+    
+
+    <script>
+        let grassPatches = [];
+        let grassIdCounter = 0;
+
+        // Initialize with the first grass patch in the center
+        function initializeGarden() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight - 130; // 130px from bottom (50px + 80px grass height)
+            
+            createGrassPatch(centerX, centerY);
+        }
+
+        function createGrassPatch(x, y) {
+            const grassContainer = document.createElement('div');
+            grassContainer.className = 'grass-container spawning';
+            grassContainer.style.left = (x - 40) + 'px'; // Center the 80px wide grass
+            grassContainer.style.bottom = (window.innerHeight - y - 40) + 'px'; // Center the 80px tall grass
+            grassContainer.dataset.id = grassIdCounter++;
+            grassContainer.dataset.growthStage = '0';
+            
+            const grassImage = document.createElement('div');
+            grassImage.className = 'grass-image';
+            
+            grassContainer.appendChild(grassImage);
+            document.body.appendChild(grassContainer);
+            
+            grassPatches.push({
+                element: grassContainer,
+                x: x,
+                y: y,
+                growthStage: 0,
+                hasSpawned: false
+            });
+
+            // Remove spawning animation class after animation completes
+            setTimeout(() => {
+                grassContainer.classList.remove('spawning');
+            }, 500);
+        }
+
+        function createWaterDrop(x, y) {
+            const drop = document.createElement('div');
+            drop.className = 'water-drop';
+            drop.style.left = x + 'px';
+            drop.style.top = y + 'px';
+            document.body.appendChild(drop);
+
+            // Remove the drop after animation
+            setTimeout(() => {
+                if (drop.parentNode) {
+                    drop.parentNode.removeChild(drop);
+                }
+            }, 800);
+        }
+
+        function findGrassInRange(x, y) {
+            const wateringRange = 120; // Range of the watering can
+            let grassInRange = [];
+            
+            grassPatches.forEach(patch => {
+                const distance = Math.sqrt((x - patch.x) ** 2 + (y - patch.y) ** 2);
+                if (distance < wateringRange && patch.growthStage < 5) {
+                    grassInRange.push({
+                        patch: patch,
+                        distance: distance
+                    });
+                }
+            });
+            
+            // Sort by distance (closest first)
+            grassInRange.sort((a, b) => a.distance - b.distance);
+            
+            return grassInRange;
+        }
+
+        function waterGrass(x, y) {
+            const grassInRange = findGrassInRange(x, y);
+            
+            // Water all grass patches within range
+            grassInRange.forEach((grassData, index) => {
+                const grass = grassData.patch;
+                
+                // Only water if grass hasn't reached maximum growth
+                if (grass.growthStage < 5) {
+                    // Add a small delay for visual effect (closer grass grows first)
+                    setTimeout(() => {
+                        grass.growthStage++;
+                        
+                        const grassImage = grass.element.querySelector('.grass-image');
+                        
+                        // Remove previous stage classes
+                        grassImage.className = 'grass-image';
+                        
+                        // Add new stage class
+                        if (grass.growthStage > 0) {
+                            grassImage.classList.add('stage' + grass.growthStage);
+                        }
+                        
+                        // Spawn new grass when reaching maximum growth
+                        if (grass.growthStage === 5 && !grass.hasSpawned) {
+                            grass.hasSpawned = true;
+                            // Add slight delay to spawning for better visual flow
+                            setTimeout(() => {
+                                spawnNewGrass(grass.x, grass.y);
+                            }, 300);
+                        }
+                    }, index * 100); // 100ms delay between each grass patch growth
+                }
+            });
+        }
+
+        function spawnNewGrass(centerX, centerY) {
+            const spawnRadius = 180; // Distance from parent grass (increased)
+            const maxAttempts = 100; // Prevent infinite loops
+            const minDistance = 160; // Minimum distance between grass patches (increased)
+            
+            // Try to spawn 2-4 new grass patches around the parent
+            const numSpawns = Math.floor(Math.random() * 3) + 2;
+            
+            for (let i = 0; i < numSpawns; i++) {
+                let attempts = 0;
+                let validPosition = false;
+                let newX, newY;
+                
+                while (!validPosition && attempts < maxAttempts) {
+                    // Random angle and distance
+                    const angle = Math.random() * 2 * Math.PI;
+                    const distance = spawnRadius + Math.random() * 80; // More variation in distance
+                    
+                    newX = centerX + Math.cos(angle) * distance;
+                    newY = centerY + Math.sin(angle) * distance;
+                    
+                    // Check bounds (account for grass size when fully grown - scale 2.5 = 200px)
+                    if (newX < 100 || newX > window.innerWidth - 100 || 
+                        newY < 200 || newY > window.innerHeight - 150) {
+                        attempts++;
+                        continue;
+                    }
+                    
+                    // Check distance from existing grass
+                    validPosition = true;
+                    for (let patch of grassPatches) {
+                        const dist = Math.sqrt((newX - patch.x) ** 2 + (newY - patch.y) ** 2);
+                        if (dist < minDistance) {
+                            validPosition = false;
+                            break;
+                        }
+                    }
+                    
+                    attempts++;
+                }
+                
+                // If we found a valid position, spawn the grass
+                if (validPosition) {
+                    setTimeout(() => {
+                        createGrassPatch(newX, newY);
+                    }, i * 200); // Stagger the spawning
+                }
+            }
+        }
+
+        // Main click handler
+        document.addEventListener('click', (e) => {
+            // Add watering effect to body (switches to tilted cursor)
+            document.body.classList.add('watering');
+            
+            // Create multiple water drops for better effect
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createWaterDrop(
+                        e.clientX + (Math.random() - 0.5) * 20,
+                        e.clientY + (Math.random() - 0.5) * 20
+                    );
+                }, i * 100);
+            }
+            
+            // Check if we should water the grass
+            waterGrass(e.clientX, e.clientY);
+            
+            // Remove watering effect after a short time
+            setTimeout(() => {
+                document.body.classList.remove('watering');
+            }, 500);
+        });
+
+        // Prevent context menu on right click for better experience
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            // Update grass positions if needed (optional enhancement)
+        });
+
+        // Initialize the garden when page loads
+        window.addEventListener('load', initializeGarden);
+    </script>
+</body>
+</html>
