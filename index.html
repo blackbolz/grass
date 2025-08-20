@@ -29,7 +29,7 @@
         /* Main heading */
         .main-heading {
             position: fixed;
-            top: 50px;
+            top: 30px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -38,6 +38,131 @@
             font-weight: bold;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
             z-index: 100;
+        }
+
+        /* Social buttons container */
+        .social-buttons {
+            position: fixed;
+            top: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .social-button {
+            width: 50px;
+            height: 50px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background-color: transparent;
+        }
+
+        .social-button:hover {
+            transform: scale(1.15);
+        }
+
+        /* Contact info box */
+        .contact-box {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 2px solid #2E7D32;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .contact-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: 8px;
+        }
+
+        .contact-address {
+            font-family: monospace;
+            font-size: 12px;
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            word-break: break-all;
+            max-width: 300px;
+        }
+
+        .copy-button {
+            background: #2E7D32;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: #1B5E20;
+            transform: scale(1.05);
+        }
+
+        .copy-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Admin controls */
+        .admin-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            z-index: 200;
+            font-size: 12px;
+            max-width: 300px;
+        }
+
+        .admin-controls h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .admin-controls input {
+            width: 100%;
+            padding: 5px;
+            margin: 3px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .admin-controls button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            margin: 3px 0;
+        }
+
+        .admin-controls button:hover {
+            background: #45a049;
         }
 
         /* Grass container */
@@ -89,7 +214,7 @@
         /* Instructions */
         .instructions {
             position: fixed;
-            bottom: 150px;
+            bottom: 180px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -169,7 +294,53 @@
     </style>
 </head>
 <body>
+    <!-- Admin Controls -->
+    <div class="admin-controls">
+        <h3>Admin Controls</h3>
+        
+        <div style="margin-bottom: 10px;">
+            <strong>Contact Address:</strong><br>
+            <input type="text" id="contactInput" placeholder="Enter contract address" value="0x1234567890abcdef1234567890abcdef12345678">
+            <button onclick="updateContact()">Update</button>
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+            <strong>Button 1:</strong><br>
+            <input type="text" id="btn1Link" placeholder="Button 1 Link" value="https://twitter.com">
+            <input type="text" id="btn1Image" placeholder="Button 1 PNG path" value="images/twitter.png">
+            <button onclick="updateButton(1)">Update</button>
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+            <strong>Button 2:</strong><br>
+            <input type="text" id="btn2Link" placeholder="Button 2 Link" value="https://telegram.org">
+            <input type="text" id="btn2Image" placeholder="Button 2 PNG path" value="images/telegram.png">
+            <button onclick="updateButton(2)">Update</button>
+        </div>
+        
+        <div>
+            <strong>Button 3:</strong><br>
+            <input type="text" id="btn3Link" placeholder="Button 3 Link" value="https://discord.com">
+            <input type="text" id="btn3Image" placeholder="Button 3 PNG path" value="images/discord.png">
+            <button onclick="updateButton(3)">Update</button>
+        </div>
+    </div>
+
     <h1 class="main-heading">GRASS - always gets greener when watered</h1>
+
+    <!-- Social Media Buttons -->
+    <div class="social-buttons">
+        <button class="social-button" id="social-btn-1" onclick="openLink(1)"></button>
+        <button class="social-button" id="social-btn-2" onclick="openLink(2)"></button>
+        <button class="social-button" id="social-btn-3" onclick="openLink(3)"></button>
+    </div>
+
+    <!-- Contact Info Box -->
+    <div class="contact-box">
+        <div class="contact-title">Contract Address</div>
+        <div class="contact-address" id="contractAddress">0x1234567890abcdef1234567890abcdef12345678</div>
+        <button class="copy-button" onclick="copyAddress()">Copy Address</button>
+    </div>
 
     <!-- Instructions for adding your PNG files -->
     
@@ -179,11 +350,77 @@
         let grassIdCounter = 0;
         let isWatering = false;
         let wateringInterval = null;
+        
+        // Social button data
+        let socialButtons = {
+            1: { link: 'https://twitter.com', image: 'images/twitter.png' },
+            2: { link: 'https://telegram.org', image: 'images/telegram.png' },
+            3: { link: 'https://discord.com', image: 'images/discord.png' }
+        };
+
+        // Initialize social buttons on page load
+        function initializeSocialButtons() {
+            for (let i = 1; i <= 3; i++) {
+                updateButton(i);
+            }
+        }
+
+        function updateContact() {
+            const newAddress = document.getElementById('contactInput').value;
+            document.getElementById('contractAddress').textContent = newAddress;
+        }
+
+        function updateButton(buttonNum) {
+            const link = document.getElementById(`btn${buttonNum}Link`).value;
+            const image = document.getElementById(`btn${buttonNum}Image`).value;
+            
+            socialButtons[buttonNum] = { link: link, image: image };
+            
+            const button = document.getElementById(`social-btn-${buttonNum}`);
+            button.style.backgroundImage = `url('${image}')`;
+        }
+
+        function openLink(buttonNum) {
+            const link = socialButtons[buttonNum].link;
+            if (link) {
+                window.open(link, '_blank');
+            }
+        }
+
+        function copyAddress() {
+            const address = document.getElementById('contractAddress').textContent;
+            navigator.clipboard.writeText(address).then(() => {
+                const button = document.querySelector('.copy-button');
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#4CAF50';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#2E7D32';
+                }, 2000);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = address;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const button = document.querySelector('.copy-button');
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
 
         // Initialize with the first grass patch in the center
         function initializeGarden() {
             const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight - 130; // 130px from bottom (50px + 80px grass height)
+            const centerY = window.innerHeight - 200; // Moved up to make room for contact box
             
             createGrassPatch(centerX, centerY);
         }
@@ -515,7 +752,10 @@
         });
 
         // Initialize the garden when page loads
-        window.addEventListener('load', initializeGarden);
+        window.addEventListener('load', () => {
+            initializeGarden();
+            initializeSocialButtons();
+        });
     </script>
 </body>
 </html>
