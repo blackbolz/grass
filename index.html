@@ -82,8 +82,8 @@
 
         /* Watering can tilt effect */
         body.watering {
-            /* Tilted watering can - replace with your tilted watering can PNG */
-            cursor: url('images/watering-can-tilted.png') 16 16, auto;
+            /* Tilted watering can PNG */
+            cursor: url('images/watering-can-tilted.png'), auto;
         }
 
         /* Instructions */
@@ -333,14 +333,14 @@
         }
 
         function createWaterAndGrow(x, y) {
-            // Create water drops
-            for (let i = 0; i < 3; i++) {
+            // Create water drops (reduced amount)
+            for (let i = 0; i < 1; i++) {
                 setTimeout(() => {
                     createWaterDrop(
-                        x + (Math.random() - 0.5) * 30,
-                        y + (Math.random() - 0.5) * 20
+                        x + (Math.random() - 0.5) * 20,
+                        y + (Math.random() - 0.5) * 15
                     );
-                }, i * 50);
+                }, i * 100);
             }
             
             // Water the grass
