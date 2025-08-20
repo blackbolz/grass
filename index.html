@@ -80,6 +80,7 @@
             text-align: center;
             z-index: 100;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-width: 400px;
         }
 
         .contact-title {
@@ -89,6 +90,12 @@
             margin-bottom: 8px;
         }
 
+        .contact-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .contact-address {
             font-family: monospace;
             font-size: 12px;
@@ -96,9 +103,9 @@
             padding: 8px 12px;
             border-radius: 8px;
             border: 1px solid #ddd;
-            margin-bottom: 10px;
             word-break: break-all;
-            max-width: 300px;
+            flex: 1;
+            text-align: left;
         }
 
         .copy-button {
@@ -110,6 +117,8 @@
             cursor: pointer;
             font-size: 12px;
             transition: all 0.3s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .copy-button:hover {
@@ -255,15 +264,17 @@
     <!-- Social Media Buttons -->
     <div class="social-buttons">
         <button class="social-button" id="social-btn-1" onclick="openLink(1)" style="background-image: url('images/twitter.png')"></button>
-        <button class="social-button" id="social-btn-2" onclick="openLink(2)" style="background-image: url('images/dex.png')"></button>
-        <button class="social-button" id="social-btn-3" onclick="openLink(3)" style="background-image: url('images/pumpfun.png')"></button>
+        <button class="social-button" id="social-btn-2" onclick="openLink(2)" style="background-image: url('images/telegram.png')"></button>
+        <button class="social-button" id="social-btn-3" onclick="openLink(3)" style="background-image: url('images/discord.png')"></button>
     </div>
 
     <!-- Contact Info Box -->
     <div class="contact-box">
         <div class="contact-title">Contract Address</div>
-        <div class="contact-address" id="contractAddress">0x1234567890abcdef1234567890abcdef12345678</div>
-        <button class="copy-button" onclick="copyAddress()">Copy Address</button>
+        <div class="contact-content">
+            <div class="contact-address" id="contractAddress">0x1234567890abcdef1234567890abcdef12345678</div>
+            <button class="copy-button" onclick="copyAddress()">Copy</button>
+        </div>
     </div>
 
     <script>
@@ -274,9 +285,9 @@
         
         // Social button links (edit these directly in the code)
         const socialLinks = {
-            1: 'https://x.com',      // Button 1 - Twitter
-            2: 'https://dexscreener.com',     // Button 2 -   
-            3: 'https://pump.fun/board'       // Button 3 - 
+            1: 'https://twitter.com',      // Button 1 - Twitter
+            2: 'https://telegram.org',     // Button 2 - Telegram  
+            3: 'https://discord.com'       // Button 3 - Discord
         };
 
         function openLink(buttonNum) {
@@ -651,10 +662,7 @@
         });
 
         // Initialize the garden when page loads
-        window.addEventListener('load', () => {
-            initializeGarden();
-            initializeSocialButtons();
-        });
+        window.addEventListener('load', initializeGarden);
     </script>
 </body>
 </html>
