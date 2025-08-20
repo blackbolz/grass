@@ -120,51 +120,7 @@
         .copy-button:active {
             transform: scale(0.95);
         }
-
-        /* Admin controls */
-        .admin-controls {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
-            border-radius: 10px;
-            border: 2px solid #ddd;
-            z-index: 200;
-            font-size: 12px;
-            max-width: 300px;
-        }
-
-        .admin-controls h3 {
-            margin: 0 0 10px 0;
-            color: #333;
-            font-size: 14px;
-        }
-
-        .admin-controls input {
-            width: 100%;
-            padding: 5px;
-            margin: 3px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 11px;
-        }
-
-        .admin-controls button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            margin: 3px 0;
-        }
-
-        .admin-controls button:hover {
-            background: #45a049;
-        }
-
+        
         /* Grass container */
         .grass-container {
             position: fixed;
@@ -306,22 +262,22 @@
         
         <div style="margin-bottom: 10px;">
             <strong>Button 1:</strong><br>
-            <input type="text" id="btn1Link" placeholder="Button 1 Link" value="https://twitter.com">
+            <input type="text" id="btn1Link" placeholder="Button 1 Link" value="https://x.com">
             <input type="text" id="btn1Image" placeholder="Button 1 PNG path" value="images/twitter.png">
             <button onclick="updateButton(1)">Update</button>
         </div>
         
         <div style="margin-bottom: 10px;">
             <strong>Button 2:</strong><br>
-            <input type="text" id="btn2Link" placeholder="Button 2 Link" value="https://telegram.org">
-            <input type="text" id="btn2Image" placeholder="Button 2 PNG path" value="images/telegram.png">
+            <input type="text" id="btn2Link" placeholder="Button 2 Link" value="https://dexscreener.com">
+            <input type="text" id="btn2Image" placeholder="Button 2 PNG path" value="images/dex.png">
             <button onclick="updateButton(2)">Update</button>
         </div>
         
         <div>
             <strong>Button 3:</strong><br>
-            <input type="text" id="btn3Link" placeholder="Button 3 Link" value="https://discord.com">
-            <input type="text" id="btn3Image" placeholder="Button 3 PNG path" value="images/discord.png">
+            <input type="text" id="btn3Link" placeholder="Button 3 Link" value="https://pump.fun/board">
+            <input type="text" id="btn3Image" placeholder="Button 3 PNG path" value="images/pumpfun.png">
             <button onclick="updateButton(3)">Update</button>
         </div>
     </div>
