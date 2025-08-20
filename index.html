@@ -60,17 +60,17 @@
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
             pointer-events: none;
             opacity: 0.8;
-            animation: fall 0.8s ease-in forwards;
+            animation: fall-long 1.5s ease-in forwards;
             z-index: 50;
         }
 
-        @keyframes fall {
+        @keyframes fall-long {
             0% {
                 transform: translateY(0) rotate(0deg);
                 opacity: 0.8;
             }
             100% {
-                transform: translateY(150px) rotate(10deg);
+                transform: translateY(400px) rotate(15deg);
                 opacity: 0;
             }
         }
@@ -172,6 +172,8 @@
     <script>
         let grassPatches = [];
         let grassIdCounter = 0;
+        let isWatering = false;
+        let wateringInterval = null;
 
         // Initialize with the first grass patch in the center
         function initializeGarden() {
@@ -221,19 +223,27 @@
                 if (drop.parentNode) {
                     drop.parentNode.removeChild(drop);
                 }
-            }, 800);
+            }, 1500);
         }
 
-        function findGrassInRange(x, y) {
-            const wateringRange = 120; // Range of the watering can
+        function findGrassInWaterPath(x, y) {
+            const wateringRange = 200; // Increased range for water falling
             let grassInRange = [];
             
             grassPatches.forEach(patch => {
-                const distance = Math.sqrt((x - patch.x) ** 2 + (y - patch.y) ** 2);
-                if (distance < wateringRange && patch.growthStage < 5) {
+                // Calculate if grass is in the path of falling water
+                const horizontalDistance = Math.abs(x - patch.x);
+                const verticalDistance = Math.abs(y - patch.y);
+                
+                // Check if water can reach this grass (considering water falls down and spreads a bit)
+                if (horizontalDistance < wateringRange && 
+                    (y <= patch.y || verticalDistance < 100) && // Water above grass or close vertically
+                    patch.growthStage < 5) {
+                    
+                    const totalDistance = Math.sqrt(horizontalDistance ** 2 + verticalDistance ** 2);
                     grassInRange.push({
                         patch: patch,
-                        distance: distance
+                        distance: totalDistance
                     });
                 }
             });
@@ -245,7 +255,7 @@
         }
 
         function waterGrass(x, y) {
-            const grassInRange = findGrassInRange(x, y);
+            const grassInRange = findGrassInWaterPath(x, y);
             
             // Water all grass patches within range
             grassInRange.forEach((grassData, index) => {
@@ -278,6 +288,55 @@
                     }, index * 100); // 100ms delay between each grass patch growth
                 }
             });
+        }
+
+        function startWatering(x, y) {
+            if (isWatering) return;
+            
+            isWatering = true;
+            document.body.classList.add('watering');
+            
+            // Immediate watering effect
+            createWaterAndGrow(x, y);
+            
+            // Continue watering while dragging
+            wateringInterval = setInterval(() => {
+                if (isWatering) {
+                    createWaterAndGrow(x, y);
+                }
+            }, 150); // Water drops every 150ms
+        }
+
+        function updateWatering(x, y) {
+            if (!isWatering) return;
+            
+            // Update watering position for drag effect
+            createWaterAndGrow(x, y);
+        }
+
+        function stopWatering() {
+            isWatering = false;
+            document.body.classList.remove('watering');
+            
+            if (wateringInterval) {
+                clearInterval(wateringInterval);
+                wateringInterval = null;
+            }
+        }
+
+        function createWaterAndGrow(x, y) {
+            // Create water drops
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    createWaterDrop(
+                        x + (Math.random() - 0.5) * 30,
+                        y + (Math.random() - 0.5) * 20
+                    );
+                }, i * 50);
+            }
+            
+            // Water the grass
+            waterGrass(x, y);
         }
 
         function spawnNewGrass(centerX, centerY) {
@@ -330,28 +389,52 @@
             }
         }
 
-        // Main click handler
-        document.addEventListener('click', (e) => {
-            // Add watering effect to body (switches to tilted cursor)
-            document.body.classList.add('watering');
-            
-            // Create multiple water drops for better effect
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    createWaterDrop(
-                        e.clientX + (Math.random() - 0.5) * 20,
-                        e.clientY + (Math.random() - 0.5) * 20
-                    );
-                }, i * 100);
+        // Mouse event handlers
+        let currentX = 0, currentY = 0;
+
+        // Mouse down - start watering
+        document.addEventListener('mousedown', (e) => {
+            currentX = e.clientX;
+            currentY = e.clientY;
+            startWatering(currentX, currentY);
+        });
+
+        // Mouse move - continue watering if dragging
+        document.addEventListener('mousemove', (e) => {
+            currentX = e.clientX;
+            currentY = e.clientY;
+            if (isWatering) {
+                updateWatering(currentX, currentY);
             }
-            
-            // Check if we should water the grass
-            waterGrass(e.clientX, e.clientY);
-            
-            // Remove watering effect after a short time
-            setTimeout(() => {
-                document.body.classList.remove('watering');
-            }, 500);
+        });
+
+        // Mouse up - stop watering
+        document.addEventListener('mouseup', () => {
+            stopWatering();
+        });
+
+        // Touch event handlers for mobile
+        document.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            currentX = touch.clientX;
+            currentY = touch.clientY;
+            startWatering(currentX, currentY);
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            currentX = touch.clientX;
+            currentY = touch.clientY;
+            if (isWatering) {
+                updateWatering(currentX, currentY);
+            }
+        });
+
+        document.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopWatering();
         });
 
         // Prevent context menu on right click for better experience
