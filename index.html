@@ -207,7 +207,8 @@
                 x: x,
                 y: y,
                 growthStage: 0,
-                hasSpawned: false
+                hasSpawned: false,
+                isGrowing: false
             });
 
             // Remove spawning animation class after animation completes
@@ -266,33 +267,48 @@
             grassInRange.forEach((grassData, index) => {
                 const grass = grassData.patch;
                 
-                // Only water if grass hasn't reached maximum growth
-                if (grass.growthStage < 5) {
+                // Only water if grass hasn't reached maximum growth and isn't currently being watered
+                if (grass.growthStage < 5 && !grass.isGrowing) {
+                    // Mark this grass as currently growing to prevent conflicts
+                    grass.isGrowing = true;
+                    
                     // Add a small delay for visual effect (closer grass grows first)
                     setTimeout(() => {
-                        grass.growthStage++;
-                        
-                        const grassImage = grass.element.querySelector('.grass-image');
-                        
-                        // Remove ALL previous stage classes to ensure clean slate
-                        grassImage.classList.remove('stage1', 'stage2', 'stage3', 'stage4', 'stage5');
-                        
-                        // Add new stage class
-                        if (grass.growthStage > 0) {
-                            grassImage.classList.add('stage' + grass.growthStage);
+                        // Double-check that grass is still valid and not at max growth
+                        if (grass.growthStage < 5) {
+                            grass.growthStage++;
+                            
+                            const grassImage = grass.element.querySelector('.grass-image');
+                            
+                            // Remove ALL previous stage classes to ensure clean slate
+                            grassImage.classList.remove('stage1', 'stage2', 'stage3', 'stage4', 'stage5');
+                            
+                            // Add new stage class
+                            if (grass.growthStage > 0) {
+                                grassImage.classList.add('stage' + grass.growthStage);
+                            }
+                            
+                            // Update the data attribute to match the current stage
+                            grass.element.dataset.growthStage = grass.growthStage.toString();
+                            
+                            // Force a reflow to ensure the transition applies properly
+                            grassImage.offsetHeight;
+                            
+                            // Spawn new grass when reaching maximum growth
+                            if (grass.growthStage === 5 && !grass.hasSpawned) {
+                                grass.hasSpawned = true;
+                                // Add slight delay to spawning for better visual flow
+                                setTimeout(() => {
+                                    spawnNewGrass(grass.x, grass.y);
+                                }, 300);
+                            }
                         }
                         
-                        // Force a reflow to ensure the transition applies properly
-                        grassImage.offsetHeight;
+                        // Mark growth as complete after transition time
+                        setTimeout(() => {
+                            grass.isGrowing = false;
+                        }, 1200); // Match the CSS transition time
                         
-                        // Spawn new grass when reaching maximum growth
-                        if (grass.growthStage === 5 && !grass.hasSpawned) {
-                            grass.hasSpawned = true;
-                            // Add slight delay to spawning for better visual flow
-                            setTimeout(() => {
-                                spawnNewGrass(grass.x, grass.y);
-                            }, 300);
-                        }
                     }, index * 200); // Increased delay between each grass patch growth (slower)
                 }
             });
@@ -312,7 +328,7 @@
                 if (isWatering) {
                     createWaterAndGrow(x, y);
                 }
-            }, 300); // Water drops every 300ms (slower watering)
+            }, 800); // Water drops every 800ms (much slower watering)
         }
 
         function updateWatering(x, y) {
