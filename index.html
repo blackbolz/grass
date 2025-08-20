@@ -364,12 +364,12 @@
         }
 
         function spawnNewGrass(centerX, centerY) {
-            const spawnRadius = 180; // Distance from parent grass (increased)
-            const maxAttempts = 100; // Prevent infinite loops
-            const minDistance = 160; // Minimum distance between grass patches (increased)
+            const spawnRadius = 120; // Reduced distance from parent grass for denser growth
+            const maxAttempts = 150; // Increased attempts to find valid positions
+            const minDistance = 100; // Reduced minimum distance between grass patches for denser packing
             
-            // Try to spawn 2-4 new grass patches around the parent
-            const numSpawns = Math.floor(Math.random() * 3) + 2;
+            // Try to spawn 3-6 new grass patches around the parent (increased from 2-4)
+            const numSpawns = Math.floor(Math.random() * 4) + 3;
             
             for (let i = 0; i < numSpawns; i++) {
                 let attempts = 0;
@@ -379,14 +379,14 @@
                 while (!validPosition && attempts < maxAttempts) {
                     // Random angle and distance
                     const angle = Math.random() * 2 * Math.PI;
-                    const distance = spawnRadius + Math.random() * 80; // More variation in distance
+                    const distance = spawnRadius + Math.random() * 100; // Increased variation in distance
                     
                     newX = centerX + Math.cos(angle) * distance;
                     newY = centerY + Math.sin(angle) * distance;
                     
-                    // Check bounds (account for grass size when fully grown - scale 2.5 = 200px)
-                    if (newX < 100 || newX > window.innerWidth - 100 || 
-                        newY < 200 || newY > window.innerHeight - 150) {
+                    // More lenient bounds checking (reduced margins for more grass)
+                    if (newX < 80 || newX > window.innerWidth - 80 || 
+                        newY < 180 || newY > window.innerHeight - 120) {
                         attempts++;
                         continue;
                     }
@@ -408,9 +408,52 @@
                 if (validPosition) {
                     setTimeout(() => {
                         createGrassPatch(newX, newY);
-                    }, i * 200); // Stagger the spawning
+                    }, i * 150); // Reduced stagger time for faster spawning
                 }
             }
+            
+            // Additional spawning round with wider radius for continued expansion
+            setTimeout(() => {
+                const wideSpawnRadius = 200;
+                const wideNumSpawns = Math.floor(Math.random() * 3) + 2;
+                
+                for (let i = 0; i < wideNumSpawns; i++) {
+                    let attempts = 0;
+                    let validPosition = false;
+                    let newX, newY;
+                    
+                    while (!validPosition && attempts < maxAttempts) {
+                        const angle = Math.random() * 2 * Math.PI;
+                        const distance = wideSpawnRadius + Math.random() * 120;
+                        
+                        newX = centerX + Math.cos(angle) * distance;
+                        newY = centerY + Math.sin(angle) * distance;
+                        
+                        if (newX < 80 || newX > window.innerWidth - 80 || 
+                            newY < 180 || newY > window.innerHeight - 120) {
+                            attempts++;
+                            continue;
+                        }
+                        
+                        validPosition = true;
+                        for (let patch of grassPatches) {
+                            const dist = Math.sqrt((newX - patch.x) ** 2 + (newY - patch.y) ** 2);
+                            if (dist < minDistance) {
+                                validPosition = false;
+                                break;
+                            }
+                        }
+                        
+                        attempts++;
+                    }
+                    
+                    if (validPosition) {
+                        setTimeout(() => {
+                            createGrassPatch(newX, newY);
+                        }, 1000 + i * 150); // Delayed second wave
+                    }
+                }
+            }, 800); // Delay before second spawning wave
         }
 
         // Mouse event handlers
